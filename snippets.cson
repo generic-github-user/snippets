@@ -1,0 +1,818 @@
+# Your snippets
+#
+# Atom snippets allow you to enter a simple prefix in the editor and hit tab to
+# expand the prefix into a larger code block with templated values.
+#
+# You can create a new snippet in this file by typing "snip" and then hitting
+# tab.
+#
+# An example CoffeeScript snippet to expand log to console.log:
+#
+# '.source.coffee':
+#	 'Console log':
+#		 'prefix': 'log'
+#		 'body': 'console.log $1'
+#
+# Each scope (e.g. '.source.coffee' above) can only be declared once.
+#
+# This file uses CoffeeScript Object Notation (CSON).
+# If you are unfamiliar with CSON, you can read more about it in the
+# Atom Flight Manual:
+# http://flight-manual.atom.io/using-atom/sections/basic-customization/#_cson
+
+'.source.js':
+	'if, else if, else':
+		'prefix': 'ieie'
+		'body': """
+			if (${1:true}) {
+				$2
+			} else if (${3:false}) {
+				$4
+			} else {
+				$5
+			}
+		"""
+	'MDL Dialog JS':
+		'prefix': 'dialog'
+		'body': """
+					var dialog = document.querySelector('dialog');
+					var showDialogButton = document.querySelector('#show-dialog');
+					if (! dialog.showModal) {
+						dialogPolyfill.registerDialog(dialog);
+					}
+					showDialogButton.addEventListener('click', function() {
+						dialog.showModal();
+					});
+					dialog.querySelector('.close').addEventListener('click', function() {
+						dialog.close();
+					});
+		"""
+	'Cloud Firestore Add Data':
+		'prefix': 'firestore add data'
+		'body': """
+			firebase.firestore().collection("${1:users}").add({
+					first: "Ada",
+					last: "Lovelace",
+					born: 1815
+			})
+			.then(function(docRef) {
+					console.log("Document written with ID: ", docRef.id);
+			})
+			.catch(function(error) {
+					console.error("Error adding document: ", error);
+			});
+		"""
+	'Cloud Firestore Get':
+		'prefix': 'firestore get'
+		'body': """
+		firebase.firestore().collection('${1:cities}').doc('${2:SF}').docRef.get().then(function(doc) {
+					if (doc.exists) {
+								console.log("Document data:", doc.data());
+					} else {
+								// doc.data() will be undefined in this case
+								console.log("No such document!");
+					}
+		}).catch(function(error) {
+					console.log("Error getting document:", error);
+		});
+		"""
+	'Firebase Auth Create User':
+		'prefix': 'firebase auth create'
+		'body': """
+		firebase.auth().createUserWithEmailAndPassword(email, password)
+					.then(function(result) {
+								window.location.replace('./index.html');
+					}).catch(function(error) {
+								console.error(error);
+					});
+		"""
+	'Cloud Firestore Delete':
+		'prefix': 'firestore delete'
+		'body': """
+		firebase.firestore().collection("${1:cities}").doc(${2:"DC"}).delete().then(function() {
+		    console.log("Document successfully deleted!");
+		}).catch(function(error) {
+		    console.error("Error removing document: ", error);
+		});
+		"""
+	'jQuery Button Click':
+		'prefix': 'button click jquery'
+		'body': """
+		$('${1:#selector}').click(function() {
+
+		});
+		"""
+	'Firebase ID Generator':
+		'prefix': 'firebase id generator'
+		'body': """
+		// https://gist.github.com/mikelehen/3596a30bd69384624c11
+
+		/**
+		 * Fancy ID generator that creates 20-character string identifiers with the following properties:
+		 *
+		 * 1. They're based on timestamp so that they sort *after* any existing ids.
+		 * 2. They contain 72-bits of random data after the timestamp so that IDs won't collide with other clients' IDs.
+		 * 3. They sort *lexicographically* (so the timestamp is converted to characters that will sort properly).
+		 * 4. They're monotonically increasing.  Even if you generate more than one in the same timestamp, the
+		 *    latter ones will sort after the former ones.  We do this by using the previous random bits
+		 *    but "incrementing" them by 1 (only in the case of a timestamp collision).
+		 */
+		generatePushID = (function() {
+		  // Modeled after base64 web-safe chars, but ordered by ASCII.
+		  var PUSH_CHARS = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz';
+
+		  // Timestamp of last push, used to prevent local collisions if you push twice in one ms.
+		  var lastPushTime = 0;
+
+		  // We generate 72-bits of randomness which get turned into 12 characters and appended to the
+		  // timestamp to prevent collisions with other clients.  We store the last characters we
+		  // generated because in the event of a collision, we'll use those same characters except
+		  // "incremented" by one.
+		  var lastRandChars = [];
+
+		  return function() {
+		    var now = new Date().getTime();
+		    var duplicateTime = (now === lastPushTime);
+		    lastPushTime = now;
+
+		    var timeStampChars = new Array(8);
+		    for (var i = 7; i >= 0; i--) {
+		      timeStampChars[i] = PUSH_CHARS.charAt(now % 64);
+		      // NOTE: Can't use << here because javascript will convert to int and lose the upper bits.
+		      now = Math.floor(now / 64);
+		    }
+		    if (now !== 0) throw new Error('We should have converted the entire timestamp.');
+
+		    var id = timeStampChars.join('');
+
+		    if (!duplicateTime) {
+		      for (i = 0; i < 12; i++) {
+		        lastRandChars[i] = Math.floor(Math.random() * 64);
+		      }
+		    } else {
+		      // If the timestamp hasn't changed since last push, use the same random number, except incremented by 1.
+		      for (i = 11; i >= 0 && lastRandChars[i] === 63; i--) {
+		        lastRandChars[i] = 0;
+		      }
+		      lastRandChars[i]++;
+		    }
+		    for (i = 0; i < 12; i++) {
+		      id += PUSH_CHARS.charAt(lastRandChars[i]);
+		    }
+		    if(id.length != 20) throw new Error('Length should be 20.');
+
+		    return id;
+		  };
+		})();
+		"""
+	'Electron Quick Start':
+		'prefix': 'electron quick start main.js'
+		'body': """
+		// https://github.com/electron/electron-quick-start/blob/master/main.js
+
+		// Modules to control application life and create native browser window
+		const {app, BrowserWindow} = require('electron')
+		const path = require('path')
+
+		// Keep a global reference of the window object, if you don't, the window will
+		// be closed automatically when the JavaScript object is garbage collected.
+		let mainWindow
+
+		function createWindow () {
+		  // Create the browser window.
+		  mainWindow = new BrowserWindow({
+		    width: 800,
+		    height: 600,
+		    webPreferences: {
+		      preload: path.join(__dirname, 'preload.js')
+		    }
+		  })
+
+		  // and load the index.html of the app.
+		  mainWindow.loadFile('index.html')
+
+		  // Open the DevTools.
+		  // mainWindow.webContents.openDevTools()
+
+		  // Emitted when the window is closed.
+		  mainWindow.on('closed', function () {
+		    // Dereference the window object, usually you would store windows
+		    // in an array if your app supports multi windows, this is the time
+		    // when you should delete the corresponding element.
+		    mainWindow = null
+		  })
+		}
+
+		// This method will be called when Electron has finished
+		// initialization and is ready to create browser windows.
+		// Some APIs can only be used after this event occurs.
+		app.on('ready', createWindow)
+
+		// Quit when all windows are closed.
+		app.on('window-all-closed', function () {
+		  // On macOS it is common for applications and their menu bar
+		  // to stay active until the user quits explicitly with Cmd + Q
+		  if (process.platform !== 'darwin') app.quit()
+		})
+
+		app.on('activate', function () {
+		  // On macOS it's common to re-create a window in the app when the
+		  // dock icon is clicked and there are no other windows open.
+		  if (mainWindow === null) createWindow()
+		})
+
+		// In this file you can include the rest of your app's specific main process
+		// code. You can also put them in separate files and require them here.
+		"""
+	'MDL Snackbar JS':
+		'prefix': 'mdl-snackbar-js'
+		'body': """
+		(function() {
+		  'use strict';
+		  var snackbarContainer = document.querySelector('#demo-snackbar-example');
+		  var showSnackbarButton = document.querySelector('#demo-show-snackbar');
+		  var handler = function(event) {
+		    showSnackbarButton.style.backgroundColor = '';
+		  };
+		  showSnackbarButton.addEventListener('click', function() {
+		    'use strict';
+		    showSnackbarButton.style.backgroundColor = '#' +
+		        Math.floor(Math.random() * 0xFFFFFF).toString(16);
+		    var data = {
+		      message: 'Button color changed.',
+		      timeout: 2000,
+		      actionHandler: handler,
+		      actionText: 'Undo'
+		    };
+		    snackbarContainer.MaterialSnackbar.showSnackbar(data);
+		  });
+		}());
+		"""
+
+'.text':
+	'MDL':
+		'prefix': 'MDL',
+		'body': 'Material Design Lite'
+	# https://stackoverflow.com/a/742455
+	'Email-Matching Regex':
+		'prefix': 'email regex'
+		'body': '^\S+@\S+$'
+
+# https://github.com/ahmadbilal/mdl-snippets/blob/master/snippets/mdl-snippets.cson
+'.text.html':
+	'MDL HTML':
+		'prefix': 'mdl-html'
+		'body': """
+			<!DOCTYPE html>
+			<html lang="en">
+				<head>
+					<meta charset="utf-8">
+					<meta http-equiv="X-UA-Compatible" content="IE=edge">
+					<meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+					<meta name="viewport" content="width=device-width, initial-scale=1">
+					<title>${1:Material Design Lite}</title>
+					<link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.indigo-pink.min.css">
+					<script src="https://storage.googleapis.com/code.getmdl.io/1.0.6/material.min.js"></script>
+					<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+				</head>
+				<body>
+					<div class="mdl-layout mdl-js-layout">
+						<header class="mdl-layout__header mdl-layout__header--scroll">
+							<div class="mdl-layout__header-row">
+								<span class="mdl-layout-title">$2</span>
+								<div class="mdl-layout-spacer"></div>
+								<nav class="mdl-navigation">
+									${3:<!-- Add MDL Navigation Links here -->}
+								</nav>
+							</div>
+						</header>
+						<div class="mdl-layout__drawer">
+							<span class="mdl-layout-title">$4</span>
+							<nav class="mdl-navigation">
+								${5:<!-- Add MDL Navigation Links here -->}
+							</nav>
+						</div>
+						<main class="mdl-layout__content">
+							$6
+						</main>
+					</div>
+				</body>
+			</html>
+		"""
+	'MDL Navigation Link':
+		'prefix': 'mdl-nav-link'
+		'body': '<a class="mdl-navigation__link" href="$1">$2</a>'
+	'MDL Grid':
+		'prefix': 'mdl-grid'
+		'body': """
+			<div class="mdl-grid">
+				$1
+			</div>
+		"""
+	'MDL Cell':
+		'prefix': 'mdl-cell'
+		'body': """
+			<div class="mdl-cell mdl-cell--$1-col">
+				$2
+			</div>
+		"""
+	'MDL Badge Icon':
+		'prefix': 'mdl-badge-icon'
+		'body': '<div class="material-icons mdl-badge mdl-badge--overlap" data-badge="$1">$2</div>'
+	'MDL Badge Text':
+		'prefix': 'mdl-badge-text'
+		'body': '<span class="mdl-badge" data-badge="$1">$2</span>'
+	'MDL Button':
+		'prefix': 'mdl-button'
+		'body': '<button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary">$1</button>'
+	'MDL Button Round':
+		'prefix': 'mdl-button-round'
+		'body': '<button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab mdl-button--colored">$1</button>'
+	'MDL Button Icon':
+		'prefix': 'mdl-button-icon'
+		'body': '<button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">$1</button>'
+	'MDL Card':
+		'prefix': 'mdl-card'
+		'body': """
+			<div class="mdl-card mdl-shadow--2dp">
+				<div class="mdl-card__title">
+					<h2 class="mdl-card__title-text">$1</h2>
+				</div>
+				<div class="mdl-card__supporting-text">
+					$2
+				</div>
+				<div class="mdl-card__actions mdl-card--border">
+					<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+						$3
+					</a>
+				</div>
+				<div class="mdl-card__menu">
+					<button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+						<i class="material-icons">share</i>
+					</button>
+					$4
+				</div>
+			</div>
+		"""
+	'MDL Card Mini':
+		'prefix': 'mdl-card-mini'
+		'body': """
+			<div class="mdl-card mdl-shadow--2dp">
+				<div class="mdl-card__title mdl-card--expand">
+					$1
+				</div>
+				<div class="mdl-card__actions mdl-card--border">
+					<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+						$2
+					</a>
+					<div class="mdl-layout-spacer"></div>
+					<a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+						$3
+					</a>
+				</div>
+			</div>
+		"""
+	'MDl List':
+		'prefix': 'mdl-list'
+		'body': """
+			<ul class="mdl-list">
+				<li class="mdl-list__item">
+					<span class="mdl-list__item-primary-content">
+						$1
+					</span>
+				</li>
+			</ul>
+		"""
+	'MDL Progress Bar':
+		'prefix': 'mdl-progress'
+		'body': '<div id="p1" class="mdl-progress mdl-js-progress"></div>'
+	'MDL Spinner':
+		'prefix': 'mdl-spin'
+		'body': '<div class="mdl-spinner mdl-js-spinner is-active"></div>'
+	'MDL Menu':
+		'prefix': 'mdl-menu'
+		'body':"""
+			<button id="demo-menu-top-left" class="mdl-button mdl-js-button mdl-button--icon">
+				<i class="material-icons">more_vert</i>
+			</button>
+			<ul class="mdl-menu mdl-menu--top-left mdl-js-menu mdl-js-ripple-effect" for="demo-menu-top-left">
+				${1:<!-- Add MDL Menu Items here -->}
+			</ul>
+		"""
+	'MDL Menu Item':
+		'prefix': 'mdl-menu-item'
+		'body': '<li class="mdl-menu__item">$1</li>'
+	'MDL Slider':
+		'prefix': 'mdl-slider'
+		'body': '<input class="mdl-slider mdl-js-slider" type="range" min="0" max="100" value="0" tabindex="0">'
+	'MDL Checkbox':
+		'prefix': 'mdl-check'
+		'body': """
+			<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-1">
+				<input type="checkbox" id="checkbox-1" class="mdl-checkbox__input" checked>
+				<span class="mdl-checkbox__label">$1</span>
+			</label>
+		"""
+	'MDL Radio Button':
+		'prefix': 'mdl-radio'
+		'body': """
+			<label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-1">
+				<input type="radio" id="option-1" class="mdl-radio__button" name="options" value="1" checked>
+				<span class="mdl-radio__label">$1</span>
+			</label>
+		"""
+	'MDL Switch':
+		'prefix': 'mdl-switch'
+		'body': """
+			<label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1">
+				<input type="checkbox" id="switch-1" class="mdl-switch__input" checked>
+				<span class="mdl-switch__label"></span>
+			</label>
+		"""
+	'MDL Table':
+		'prefix': 'mdl-table'
+		'body': """
+			<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+				$1
+			</table>
+		"""
+	'MDL Text Field':
+		'prefix': 'mdl-text'
+		'body': """
+			<form action="#">
+				<div class="mdl-textfield mdl-js-textfield">
+					<input class="mdl-textfield__input" type="text" id="sample1">
+					<label class="mdl-textfield__label" for="sample1">$1</label>
+				</div>
+			</form>
+		"""
+	'MDL Tooltip':
+		'prefix': 'mdl-tooltip'
+		'body': '<span class="mdl-tooltip" for="$1">$2</span>'
+	'MDL Contact Chip':
+		'prefix': 'mdl-chip-contact'
+		'body': """
+		<!-- Contact Chip -->
+		<span class="mdl-chip mdl-chip--contact">
+			<span class="mdl-chip__contact mdl-color--teal mdl-color-text--white">A</span>
+			<span class="mdl-chip__text">Contact Chip</span>
+		</span>
+		"""
+	'MDL Search Bar':
+		'prefix': 'mdl-search-bar'
+		'body': """
+		<div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
+	            <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
+	              	<i class="material-icons">search</i>
+	            </label>
+	            <div class="mdl-textfield__expandable-holder">
+				<input class="mdl-textfield__input" type="text" id="search">
+				<label class="mdl-textfield__label" for="search">Enter your query...</label>
+	            </div>
+          	</div>
+		"""
+	'MDL Dialog':
+		'prefix': 'mdl-dialog'
+		'body': """
+			<dialog class="mdl-dialog">
+				<h4 class="mdl-dialog__title">Allow data collection?</h4>
+				<div class="mdl-dialog__content">
+					<p>
+						Allowing us to collect data will let us get you the information you want faster.
+					</p>
+				</div>
+				<div class="mdl-dialog__actions">
+					<button type="button" class="mdl-button">Agree</button>
+					<button type="button" class="mdl-button close">Disagree</button>
+				</div>
+			</dialog>
+		"""
+	'MDL Article HTML Template':
+		'prefix': 'mdl-article-template'
+		'body': """
+		<!-- https://github.com/google/material-design-lite/blob/mdl-1.x/templates/article/index.html -->
+
+		<!doctype html>
+		<!--
+		  Material Design Lite
+		  Copyright 2015 Google Inc. All rights reserved.
+		  Licensed under the Apache License, Version 2.0 (the "License");
+		  you may not use this file except in compliance with the License.
+		  You may obtain a copy of the License at
+		      https://www.apache.org/licenses/LICENSE-2.0
+		  Unless required by applicable law or agreed to in writing, software
+		  distributed under the License is distributed on an "AS IS" BASIS,
+		  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+		  See the License for the specific language governing permissions and
+		  limitations under the License
+		-->
+		<html lang="en">
+		  <head>
+		    <meta charset="utf-8">
+		    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		    <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+		    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+		    <title>Material Design Lite</title>
+
+		    <!-- Add to homescreen for Chrome on Android -->
+		    <meta name="mobile-web-app-capable" content="yes">
+		    <link rel="icon" sizes="192x192" href="images/android-desktop.png">
+
+		    <!-- Add to homescreen for Safari on iOS -->
+		    <meta name="apple-mobile-web-app-capable" content="yes">
+		    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+		    <meta name="apple-mobile-web-app-title" content="Material Design Lite">
+		    <link rel="apple-touch-icon-precomposed" href="images/ios-desktop.png">
+
+		    <!-- Tile icon for Win8 (144x144 + tile color) -->
+		    <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
+		    <meta name="msapplication-TileColor" content="#3372DF">
+
+		    <link rel="shortcut icon" href="images/favicon.png">
+
+		    <!-- SEO: If your mobile URL is different from the desktop URL, add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones -->
+		    <!--
+		    <link rel="canonical" href="http://www.example.com/">
+		    -->
+
+		    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+		    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+		    <link rel="stylesheet" href="$$hosted_libs_prefix$$/$$version$$/material.teal-red.min.css">
+		    <link rel="stylesheet" href="styles.css">
+		    <style>
+		    #view-source {
+		      position: fixed;
+		      display: block;
+		      right: 0;
+		      bottom: 0;
+		      margin-right: 40px;
+		      margin-bottom: 40px;
+		      z-index: 900;
+		    }
+		    </style>
+		  </head>
+		  <body>
+		    <div class="demo-layout mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">
+		      <header class="demo-header mdl-layout__header mdl-layout__header--scroll mdl-color--grey-100 mdl-color-text--grey-800">
+		        <div class="mdl-layout__header-row">
+		          <span class="mdl-layout-title">Material Design Lite</span>
+		          <div class="mdl-layout-spacer"></div>
+		          <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
+		            <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
+		              <i class="material-icons">search</i>
+		            </label>
+		            <div class="mdl-textfield__expandable-holder">
+		              <input class="mdl-textfield__input" type="text" id="search">
+		              <label class="mdl-textfield__label" for="search">Enter your query...</label>
+		            </div>
+		          </div>
+		        </div>
+		      </header>
+		      <div class="demo-ribbon"></div>
+		      <main class="demo-main mdl-layout__content">
+		        <div class="demo-container mdl-grid">
+		          <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
+		          <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
+		            <div class="demo-crumbs mdl-color-text--grey-500">
+		              Google &gt; Material Design Lite &gt; How to install MDL
+		            </div>
+		            <h3>How to install MDL</h3>
+		              <p>
+		                Cillum dolor esse sit incididunt velit eiusmod magna ad nostrud officia aute dolor dolor. Magna esse ullamco pariatur adipisicing consectetur eu commodo officia. Ex cillum consequat mollit minim elit est deserunt occaecat nisi amet. Quis aliqua nostrud Lorem occaecat sunt. Eiusmod quis amet ullamco aliquip dolore ut incididunt duis adipisicing. Elit consequat nisi eiusmod aute ipsum sunt veniam do est. Occaecat mollit aliquip ut proident consectetur amet ex dolore consectetur aliqua elit.
+		              </p>
+		              <p>
+		                Commodo nisi non consectetur voluptate incididunt mollit duis dolore amet amet tempor exercitation. Qui amet aute ea aute id ad aliquip proident. Irure duis qui labore deserunt enim in quis nisi sint consequat aliqua. Ex proident labore et laborum tempor fugiat sint magna veniam minim. Nulla dolor labore adipisicing in enim mollit laboris fugiat eu. Aliquip minim cillum ullamco voluptate non dolore non ex duis fugiat duis ad. Deserunt cillum ad et nisi amet non voluptate culpa qui do. Labore ullamco et minim proident est laborum mollit ad labore deserunt ut irure dolore. Reprehenderit ad ad irure ut irure qui est eu velit eu excepteur adipisicing culpa. Laborum cupidatat ullamco eu duis anim reprehenderit proident aute ad consectetur eiusmod.
+		              </p>
+		              <p>
+		                Tempor tempor aliqua in commodo cillum Lorem magna dolore proident Lorem. Esse ad consequat est excepteur irure eu irure quis aliqua qui. Do mollit esse veniam excepteur ut veniam anim minim dolore sit commodo consequat duis commodo. Sunt dolor reprehenderit ipsum minim eiusmod eu consectetur anim excepteur eiusmod. Duis excepteur anim dolor sit enim veniam deserunt anim adipisicing Lorem elit. Cillum sunt do consequat elit laboris nisi consectetur.
+		              </p>
+		            <h3>Basic MDL Usage</h3>
+		              <p>
+		                Cillum dolor esse sit incididunt velit eiusmod magna ad nostrud officia aute dolor dolor. Magna esse ullamco pariatur adipisicing consectetur eu commodo officia. Ex cillum consequat mollit minim elit est deserunt occaecat nisi amet. Quis aliqua nostrud Lorem occaecat sunt. Eiusmod quis amet ullamco aliquip dolore ut incididunt duis adipisicing. Elit consequat nisi eiusmod aute ipsum sunt veniam do est. Occaecat mollit aliquip ut proident consectetur amet ex dolore consectetur aliqua elit.
+		              </p>
+		              <p>
+		                Commodo nisi non consectetur voluptate incididunt mollit duis dolore amet amet tempor exercitation. Qui amet aute ea aute id ad aliquip proident. Irure duis qui labore deserunt enim in quis nisi sint consequat aliqua. Ex proident labore et laborum tempor fugiat sint magna veniam minim. Nulla dolor labore adipisicing in enim mollit laboris fugiat eu. Aliquip minim cillum ullamco voluptate non dolore non ex duis fugiat duis ad. Deserunt cillum ad et nisi amet non voluptate culpa qui do. Labore ullamco et minim proident est laborum mollit ad labore deserunt ut irure dolore. Reprehenderit ad ad irure ut irure qui est eu velit eu excepteur adipisicing culpa. Laborum cupidatat ullamco eu duis anim reprehenderit proident aute ad consectetur eiusmod.
+		              </p>
+		              <p>
+		                Cillum dolor esse sit incididunt velit eiusmod magna ad nostrud officia aute dolor dolor. Magna esse ullamco pariatur adipisicing consectetur eu commodo officia. Ex cillum consequat mollit minim elit est deserunt occaecat nisi amet. Quis aliqua nostrud Lorem occaecat sunt. Eiusmod quis amet ullamco aliquip dolore ut incididunt duis adipisicing. Elit consequat nisi eiusmod aute ipsum sunt veniam do est. Occaecat mollit aliquip ut proident consectetur amet ex dolore consectetur aliqua elit.
+		              </p>
+		              <p>
+		                Commodo nisi non consectetur voluptate incididunt mollit duis dolore amet amet tempor exercitation. Qui amet aute ea aute id ad aliquip proident. Irure duis qui labore deserunt enim in quis nisi sint consequat aliqua. Ex proident labore et laborum tempor fugiat sint magna veniam minim. Nulla dolor labore adipisicing in enim mollit laboris fugiat eu. Aliquip minim cillum ullamco voluptate non dolore non ex duis fugiat duis ad. Deserunt cillum ad et nisi amet non voluptate culpa qui do. Labore ullamco et minim proident est laborum mollit ad labore deserunt ut irure dolore. Reprehenderit ad ad irure ut irure qui est eu velit eu excepteur adipisicing culpa. Laborum cupidatat ullamco eu duis anim reprehenderit proident aute ad consectetur eiusmod.
+		              </p>
+		              <p>
+		                Cillum dolor esse sit incididunt velit eiusmod magna ad nostrud officia aute dolor dolor. Magna esse ullamco pariatur adipisicing consectetur eu commodo officia. Ex cillum consequat mollit minim elit est deserunt occaecat nisi amet. Quis aliqua nostrud Lorem occaecat sunt. Eiusmod quis amet ullamco aliquip dolore ut incididunt duis adipisicing. Elit consequat nisi eiusmod aute ipsum sunt veniam do est. Occaecat mollit aliquip ut proident consectetur amet ex dolore consectetur aliqua elit.
+		              </p>
+		              <p>
+		                Commodo nisi non consectetur voluptate incididunt mollit duis dolore amet amet tempor exercitation. Qui amet aute ea aute id ad aliquip proident. Irure duis qui labore deserunt enim in quis nisi sint consequat aliqua. Ex proident labore et laborum tempor fugiat sint magna veniam minim. Nulla dolor labore adipisicing in enim mollit laboris fugiat eu. Aliquip minim cillum ullamco voluptate non dolore non ex duis fugiat duis ad. Deserunt cillum ad et nisi amet non voluptate culpa qui do. Labore ullamco et minim proident est laborum mollit ad labore deserunt ut irure dolore. Reprehenderit ad ad irure ut irure qui est eu velit eu excepteur adipisicing culpa. Laborum cupidatat ullamco eu duis anim reprehenderit proident aute ad consectetur eiusmod.
+		              </p>
+		              <p>
+		                Cillum dolor esse sit incididunt velit eiusmod magna ad nostrud officia aute dolor dolor. Magna esse ullamco pariatur adipisicing consectetur eu commodo officia. Ex cillum consequat mollit minim elit est deserunt occaecat nisi amet. Quis aliqua nostrud Lorem occaecat sunt. Eiusmod quis amet ullamco aliquip dolore ut incididunt duis adipisicing. Elit consequat nisi eiusmod aute ipsum sunt veniam do est. Occaecat mollit aliquip ut proident consectetur amet ex dolore consectetur aliqua elit.
+		              </p>
+		              <p>
+		                Commodo nisi non consectetur voluptate incididunt mollit duis dolore amet amet tempor exercitation. Qui amet aute ea aute id ad aliquip proident. Irure duis qui labore deserunt enim in quis nisi sint consequat aliqua. Ex proident labore et laborum tempor fugiat sint magna veniam minim. Nulla dolor labore adipisicing in enim mollit laboris fugiat eu. Aliquip minim cillum ullamco voluptate non dolore non ex duis fugiat duis ad. Deserunt cillum ad et nisi amet non voluptate culpa qui do. Labore ullamco et minim proident est laborum mollit ad labore deserunt ut irure dolore. Reprehenderit ad ad irure ut irure qui est eu velit eu excepteur adipisicing culpa. Laborum cupidatat ullamco eu duis anim reprehenderit proident aute ad consectetur eiusmod.
+		              </p>
+		          </div>
+		        </div>
+		        <footer class="demo-footer mdl-mini-footer">
+		          <div class="mdl-mini-footer--left-section">
+		            <ul class="mdl-mini-footer--link-list">
+		              <li><a href="#">Help</a></li>
+		              <li><a href="#">Privacy and Terms</a></li>
+		              <li><a href="#">User Agreement</a></li>
+		            </ul>
+		          </div>
+		        </footer>
+		      </main>
+		    </div>
+		    <a href="https://github.com/google/material-design-lite/blob/mdl-1.x/templates/article/" target="_blank" id="view-source" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">View Source</a>
+		    <script src="$$hosted_libs_prefix$$/$$version$$/material.min.js"></script>
+		  </body>
+		</html>
+		"""
+	'MDL Snackbar HTML':
+		'prefix': 'mdl-snackbar-html'
+		'body': """
+		<button id="demo-show-snackbar" class="mdl-button mdl-js-button mdl-button--raised" type="button">Show Snackbar</button>
+		<div id="demo-snackbar-example" class="mdl-js-snackbar mdl-snackbar">
+		  <div class="mdl-snackbar__text"></div>
+		  <button class="mdl-snackbar__action" type="button"></button>
+		</div>
+		"""
+	'MDL Dropdown':
+		'prefix': 'mdl-dropdown'
+		'body': """
+		<!-- Simple Select with arrow -->
+		<div class="mdl-textfield mdl-js-textfield getmdl-select">
+		  <input type="text" value="" class="mdl-textfield__input" id="sample2" readonly>
+		  <input type="hidden" value="" name="sample2">
+		  <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+		  <label for="sample2" class="mdl-textfield__label">Country</label>
+		  <ul for="sample2" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+		      <li class="mdl-menu__item" data-val="DEU">Germany</li>
+		      <li class="mdl-menu__item" data-val="BLR">Belarus</li>
+		      <li class="mdl-menu__item" data-val="RUS">Russia</li>
+		  </ul>
+		</div>
+		"""
+
+
+'.text.py':
+      'Gaussian Function 1D (Tensorflow)':
+            'prefix': 'gaussian'
+            'body': """
+            def gaussian(x, s, u):
+                  return (1. / (s * r_pi)) * tf.math.exp(-0.5 * ((x - u) / s) ** 2.)
+            """
+      'Gaussian Function 2D (Tensorflow)':
+            'prefix': 'gaussian blob'
+            'body': """
+            def gaussian_blob(d, s, u_x, u_y):
+                  s = tf.clip_by_value(s+0., minimum_std, 100.)
+                  range = tf.range(d, dtype='float32')
+                  m_x = gaussian(range, s, u_x)
+                  m_y = gaussian(range, s, u_y)
+                  m = tf.einsum('i,j->ij', m_x, m_y)
+
+                  return m
+            """
+      'TensorFlow Import':
+            'prefix': 'import tensorflow'
+            'body': """
+            import tensorflow as tf
+            import numpy as np
+            import matplotlib.pyplot as plt
+            import math
+            tf.enable_eager_execution()
+            """
+      'TensorFlow Reinforcement Learning Loss':
+            'prefix': 'tf rl loss'
+            'body': """
+            loss_object = tf.keras.losses.MeanAbsoluteError()
+
+            def loss(x, y):
+                  #return loss_object(y_true=y, y_pred=x)
+                  return tf.reduce_mean(tf.math.subtract(x, y) ** 2
+
+            def calculate_reward(a):
+                  #"stochastic" reward function; in other settings this could be much more complicated and nondifferentiable
+                  #reward must also be a single value!
+
+                  #return tf.reduce_mean(tf.math.abs(tf.math.subtract(target, a)), axis=1)
+                  return loss(target, a)
+            """
+      'TensorFlow Reinforcement Learning Gradients':
+            'prefix': 'tf rl grads'
+            'body': """
+            # Custom training code from https://www.tensorflow.org/tutorials/customization/custom_training_walkthrough
+
+            def critic_grad():
+                with tf.GradientTape() as tape:
+                    loss_value = critic_loss()
+                return loss_value, tape.gradient(loss_value, critic.trainable_variables)
+
+            def actor_grad():
+                with tf.GradientTape() as tape:
+                    loss_value = actor_loss()
+                return loss_value, tape.gradient(loss_value, actor.trainable_variables)
+
+            optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+            """
+      'TensorFlow Image Grid':
+            'prefix': 'tf image grid'
+            'body': """
+		# Custom-developed
+
+            def image_grid(x, size=6):
+                t = tf.unstack(x[:size * size], num=size*size, axis=0)
+                rows = [tf.concat(t[i*size:(i+1)*size], axis=0)
+                        for i in range(size)]
+                image = tf.concat(rows, axis=1)
+                return image[None]
+            """
+      'TensorFlow Reinforcement Learning Training':
+            'prefix': 'tf rl training'
+            'body': """
+		# Adapted from https://www.tensorflow.org/tutorials/customization/custom_training_walkthrough
+
+            for j in range(100):
+                  # Train critic
+                  for i in range(1):
+                      loss_value, grads = critic_grad()
+                      optimizer.apply_gradients(zip(grads, critic.trainable_variables))
+                  #print("Loss test: {}".format(critic_loss()))
+                  critic_losses.append(critic_loss())
+
+                  # Train actor
+                  for i in range(1):
+                      loss_value, grads = actor_grad()
+                      optimizer.apply_gradients(zip(grads, actor.trainable_variables))
+                  #print("Loss test: {}".format(actor_loss()))
+                  actor_losses.append(actor_loss())
+            """
+
+'.text.css':
+	# https://github.com/google/material-design-lite/blob/mdl-1.x/templates/article/styles.css
+	'MDL Article Template CSS':
+		'prefix': 'mdl-article-template'
+		'body': """
+		/**
+		 * Copyright 2015 Google Inc. All Rights Reserved.
+		 *
+		 * Licensed under the Apache License, Version 2.0 (the "License");
+		 * you may not use this file except in compliance with the License.
+		 * You may obtain a copy of the License at
+		 *
+		 *      http://www.apache.org/licenses/LICENSE-2.0
+		 *
+		 * Unless required by applicable law or agreed to in writing, software
+		 * distributed under the License is distributed on an "AS IS" BASIS,
+		 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+		 * See the License for the specific language governing permissions and
+		 * limitations under the License.
+		 */
+
+
+		.demo-ribbon {
+		  width: 100%;
+		  height: 40vh;
+		  background-color: #3F51B5;
+		  flex-shrink: 0;
+		}
+
+		.demo-main {
+		  margin-top: -35vh;
+		  flex-shrink: 0;
+		}
+
+		.demo-header .mdl-layout__header-row {
+		  padding-left: 40px;
+		}
+
+		.demo-container {
+		  max-width: 1600px;
+		  width: calc(100% - 16px);
+		  margin: 0 auto;
+		}
+
+		.demo-content {
+		  border-radius: 2px;
+		  padding: 80px 56px;
+		  margin-bottom: 80px;
+		}
+
+		.demo-layout.is-small-screen .demo-content {
+		  padding: 40px 28px;
+		}
+
+		.demo-content h3 {
+		  margin-top: 48px;
+		}
+
+		.demo-footer {
+		  padding-left: 40px;
+		}
+
+		.demo-footer .mdl-mini-footer--link-list a {
+		  font-size: 13px;
+		}
+		"""
